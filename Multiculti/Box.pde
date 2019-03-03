@@ -10,9 +10,13 @@ class Box {
   Body body;
   float w;
   float h;
+  int livespan = 5000;
+  int btime;
+  Vec2 Pos = new Vec2(0 , 0);
 
   // Constructor
   Box(float x, float y) {
+    btime = millis();
     w = random(8,16);
     h = w;
     // Add the box to the box2d world
@@ -23,13 +27,21 @@ class Box {
   void killBody() {
     box2d.destroyBody(body);
   }
+  void giveLife(int life){
+    btime = btime + (life / 4);
+  }
 
   // Is the particle ready for deletion?
   boolean done() {
     // Let's find the screen position of the particle
-    Vec2 pos = box2d.getBodyPixelCoord(body);  
+    Pos = box2d.getBodyPixelCoord(body);  
+
     // Is it off the bottom of the screen?
-    if (pos.y > height+w*h) {
+    if ((Pos.y > height+w*h) || (Pos.y < 0)|| (Pos.x < 0)|| (Pos.x > width+w*h)) {
+      killBody();
+      return true;
+    }
+    if(millis() - btime > livespan){
       killBody();
       return true;
     }
@@ -61,7 +73,8 @@ class Box {
     pushMatrix();
     translate(pos.x,pos.y);
     rotate(-a);
-    fill(175);
+    fill(50 ,255 - ((millis() - btime) * (0.051)) , 50); 
+    //fill(300);
     stroke(0);
     rect(0,0,w,h);
     popMatrix();

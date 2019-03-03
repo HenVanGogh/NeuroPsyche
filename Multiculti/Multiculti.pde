@@ -17,11 +17,16 @@ Box2DProcessing box2d;
 ArrayList<Boundary> boundaries;
 // A list for all of our rectangles
 ArrayList<Box> boxes;
+ArrayList<shine> shines;
+ArrayList<grid> Grid;
+
+  sun Sun = new sun(10 , 768 , 1366); // 768 1366
 
 void setup() {
+  
   //size(1920,1080);
   fullScreen();
-  smooth();
+  //smooth();
 
   // Initialize box2d physics and create the world
   box2d = new Box2DProcessing(this);
@@ -29,9 +34,11 @@ void setup() {
   // We are setting a custom gravity
   box2d.setGravity(0,0);
 
+
   // Create ArrayLists	
   boxes = new ArrayList<Box>();
   boundaries = new ArrayList<Boundary>();
+  
 
   // Add a bunch of fixed boundaries
   boundaries.add(new Boundary(width/2,height,width,0));
@@ -39,17 +46,30 @@ void setup() {
   boundaries.add(new Boundary(0,height/2,0,height));
   boundaries.add(new Boundary(width,height/2,0,height));
 
+
+
 }
 
 void draw() {
+  
+
+  
   background(255);
 
   // We must always step through time!
   box2d.step();
+  for (int i = boxes.size()-1; i >= 0; i--) {
+    Box b = boxes.get(i);
+    if (b.done()) {
+      boxes.remove(i);
+    }
+  } 
+  Sun.update();
+
 
   // When the mouse is clicked, add a new Box object
   if (random(1) < 0.1) {
-    Box p = new Box(random(width),10);
+    Box p = new Box(width/2 + random(20),height/2 + random(20));
     boxes.add(p);
   }
   
@@ -64,20 +84,21 @@ void draw() {
     wall.display();
   }
 
+
+
   // Display all the boxes
   for (Box b: boxes) {
+    b.giveLife(Sun.returnSun(b.Pos));
     b.display();
   }
 
   // Boxes that leave the screen, we delete them
   // (note they have to be deleted from both the box2d world and our list
-  for (int i = boxes.size()-1; i >= 0; i--) {
-    Box b = boxes.get(i);
-    if (b.done()) {
-      boxes.remove(i);
-    }
-  }
+  
+  
   
   fill(0);
+  Vec2 mouse = new Vec2(mouseX , mouseY);
   text(frameRate,20,20);
+  text(Sun.returnSun(mouse) , 20 , 40);
 }
