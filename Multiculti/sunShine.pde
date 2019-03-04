@@ -36,12 +36,17 @@ class sun{
   ArrayList<PVector> centers = new ArrayList<PVector>();
   
   int returnSun(Vec2 p){
-     int x , y;
+     int x , y , feed;
      x = floor(p.x / square);
      y = floor(p.y / square);
      
-     grid g = Grid.get((y * Xlenght) + x);
+     feed = (y * Xlenght) + x;
+     if(feed < 10549){
+     grid g = Grid.get(feed);
      return min(g.InFill , 1000);
+     }else{
+       return 0;
+     }
   }
   
   

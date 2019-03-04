@@ -28,7 +28,7 @@ class Box {
     box2d.destroyBody(body);
   }
   void giveLife(int life){
-    btime = btime + (life / 4);
+    btime = btime + (life / 6);
   }
 
   // Is the particle ready for deletion?
