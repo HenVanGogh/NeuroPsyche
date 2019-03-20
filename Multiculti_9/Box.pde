@@ -4,6 +4,8 @@
 // Box2DProcessing example
 
 // A rectangular box
+int[] data;
+
 class Box {
 
   // We need to keep track of a Body and a width and height
@@ -13,17 +15,43 @@ class Box {
   int livespan = 5000;
   int btime;
   Vec2 Pos = new Vec2(0 , 0);
+  int[] data;
+  int[][] visionTable;
+  
+  
+  
   
   brain Brain = new brain(256 , 20 , 10 , 2 );
 
   // Constructor
   Box(float x, float y) {
+    int[][] visiontable = new int[366][2];
+    int num = 0;
+
+    int visionSize = 200;
+    int interval = 200 / 16;
+    
+    for(int i = 0; i < visionSize - interval; i = i + interval){
+      for(int n = 0; n < visionSize - interval; n = n + interval){
+        visiontable[num][0] = i - (visionSize/2) + 10;
+        visiontable[num][1] = n - (visionSize/2) + 10;
+        num++;
+      }
+
+    }
+    print(num);
+    visionTable = visiontable;
+    
+    
     btime = millis();
     w = random(8,16);
     h = w;
     // Add the box to the box2d world
     makeBody(new Vec2(x,y),w,h);
     Brain.generateRandomStart();
+    
+    
+    
   }
 
   // This function removes the particle from the box2d world
@@ -35,6 +63,12 @@ class Box {
       btime = btime + (life / 6);
     }
   }
+  
+  void reciveVisuals(int[] visual){
+    data = visual;
+  }
+  
+  
 
   // Is the particle ready for deletion?
   boolean done() {
@@ -76,6 +110,7 @@ class Box {
 
   // Drawing the box
   void display() {
+    
     // We look at each body and get its screen position
     Vec2 pos = box2d.getBodyPixelCoord(body);
     // Get its angle of rotation
@@ -89,7 +124,19 @@ class Box {
     //fill(300);
     stroke(0);
     rect(0,0,w,h);
+
+    
+    strokeWeight(2);
+    fill(0 , 255 , 255);
+    for(int i = 0 ; i <=300; i++){
+        point(float(visionTable[i][0]) , float(visionTable[i][1]));
+      //point(v.x[i] , v.y[i]);
+    }
+    
     popMatrix();
+    
+    
+    Sun.returnSun(10);
   }
 
   // This function adds the rectangle to the box2d world

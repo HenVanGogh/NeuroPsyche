@@ -20,9 +20,13 @@ ArrayList<Box> boxes;
 ArrayList<shine> shines;
 ArrayList<grid> Grid;
 
+int[][] visionTable;
+
   sun Sun = new sun(10 , 768 , 1366); // 768 1366
 
 void setup() {
+  
+  
   
   //size(1920,1080);
   fullScreen();
@@ -49,6 +53,10 @@ void setup() {
 
 Box p = new Box(width/2 + random(20),height/2 + random(20));
     boxes.add(p);
+    
+    
+    
+    
 }
 
 void draw() {
