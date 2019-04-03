@@ -10,47 +10,6 @@ float [] weights;
     
   }
   
-  
-  float[] retunName(){
-    float[] name;
-     //println(weights.length);
-    name = new float[weights.length + 2];
-
-    for(int i = 0 ; i < weights.length; i++){
-     name[i] = weights[i]; 
-    }
-    name[weights.length + 1] = bias;
-    return name;
-  }
-  
-  void setNames(float[] name){
-    /*
-    println("");
-    println("");
-    println(name.length);
-    println(weights.length);
-    println("");
-    */
-    for(int i = 0 ; i < name.length - 2; i++){
-      //println(i);
-     weights[i] = name[i]; 
-    }
-    bias = name[name.length-1];
-  }
-  
-  /*
-  public byte[] floatToByteArray(float value) {
-    int intBits =  Float.floatToIntBits(value);
-    return new byte[] {
-      (byte) (intBits >> 24), (byte) (intBits >> 16), (byte) (intBits >> 8), (byte) (intBits) };
-}
-public float byteArrayToFloat(byte[] bytes) {
-    int intBits = 
-      bytes[0] << 24 | (bytes[1] & 0xFF) << 16 | (bytes[2] & 0xFF) << 8 | (bytes[3] & 0xFF);
-    return Float.intBitsToFloat(intBits);  
-}
-*/
-
   void updateWeights(float [] Weights){
     weights = new float[Weights.length];
     for (int i = 0; i < Weights.length; i++) {
@@ -77,15 +36,9 @@ public float byteArrayToFloat(byte[] bytes) {
     }
     return result;
   }
-  /*
-  float sigmoid(float input){
-   return 1.0 / 1.0 + exp(-input); 
-  }
-  */
   
   float sigmoid(float input){
-    input = input / 1000.0;
-return (atan(input) / 1.0*PI) + 0.5;
+   return 1 / 1 + exp(-input); 
   }
   
   float Relu(float input){
@@ -129,43 +82,7 @@ class brain{
      input[i] = 0;
    }
  }
-
- ArrayList<float[]> retunName(){
-   ArrayList<float[]> Name = new ArrayList<float[]>();   
-    
-   for (neuron b: Sigmoid) {
-      Name.add(b.retunName());
-    }
-    
-    for (neuron b: Linear) {
-      Name.add(b.retunName());
-    }
-    
-    for (neuron b: Output) {
-      Name.add(b.retunName());
-    }
-    return Name;
- }
- 
- void setNames(ArrayList<float[]> name){  
-    int i = 0;
-   for (neuron b: Sigmoid) {
-      b.setNames(name.get(i));
-      i++;
-    }
-    
-    for (neuron b: Linear) {
-      b.setNames(name.get(i));
-      i++;
-    }
-    
-    for (neuron b: Output) {
-      b.setNames(name.get(i));
-      i++;
-    }
-
- }
-
+  
   void generateRandomStart(){
     for (neuron b: Sigmoid) {
      b.updateBias(random(0 , 1));
@@ -218,7 +135,7 @@ class brain{
     
     i = 0;
     for (neuron b: Output) {
-      output[i] = b.sigmoid(b.output(linear));
+      output[i] = b.Relu(b.output(linear));
       i++;
     }
     
@@ -228,21 +145,21 @@ class brain{
   void mutate(int mutationFactor){
     for (neuron b: Sigmoid) {
       b.mutateBias(random(0 , mutationFactor / 100));
-      for(int i = 0; i < Sigmoid.size() ; i++){
+      for(int i = 0; i <= Sigmoid.size() ; i++){
         b.mutateWeights(random(0 , mutationFactor / 100) , i);
       }
     }
     
     for (neuron b: Linear) {
       b.mutateBias(random(0 , mutationFactor / 100));
-      for(int i = 0; i < Linear.size() ; i++){
+      for(int i = 0; i <= Linear.size() ; i++){
         b.mutateWeights(random(0 , mutationFactor / 100) , i);
       }
     }
     
     for (neuron b: Output) {
       b.mutateBias(random(0 , mutationFactor / 100));
-      for(int i = 0; i < Output.size() ; i++){
+      for(int i = 0; i <= Output.size() ; i++){
         b.mutateWeights(random(0 , mutationFactor / 100) , i);
       }
     }

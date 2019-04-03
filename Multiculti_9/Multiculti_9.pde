@@ -4,12 +4,13 @@
 // Box2DProcessing example
 
 // Basic example of falling rectangles
-
+import java.util.*; 
 import shiffman.box2d.*;
 import org.jbox2d.collision.shapes.*;
 import org.jbox2d.common.*;
 import org.jbox2d.dynamics.*;
 
+int lock = 0;
 // A reference to our box2d world
 Box2DProcessing box2d;
 
@@ -19,6 +20,9 @@ ArrayList<Boundary> boundaries;
 ArrayList<Box> boxes;
 ArrayList<shine> shines;
 ArrayList<grid> Grid;
+ArrayList<player> lifeArray;
+
+ArrayList<ArrayList<float[]>> Generations;
 
 int[][] visionTable;
 
@@ -42,6 +46,8 @@ void setup() {
   // Create ArrayLists	
   boxes = new ArrayList<Box>();
   boundaries = new ArrayList<Boundary>();
+  Generations = new ArrayList<ArrayList<float[]>>();
+  lifeArray = new ArrayList<player>();
   
 
   // Add a bunch of fixed boundaries
@@ -50,14 +56,34 @@ void setup() {
   boundaries.add(new Boundary(0,height/2,0,height));
   boundaries.add(new Boundary(width,height/2,0,height));
 
-
+for(int i = 0 ; i < 100 ; i++){
 Box p = new Box(width/2 + random(20),height/2 + random(20));
     boxes.add(p);
+}
+  
     
     
     
     
 }
+class player{
+  ArrayList<float[]> brain;
+  int score;
+  
+  player(ArrayList<float[]> Brain , int Score){
+    brain = Brain;
+    score = Score;
+  }
+}
+class SortPlayers implements Comparator<player> 
+{ 
+    // Used for sorting in ascending order of 
+    // roll number 
+    public int compare(player a, player b) 
+    { 
+        return a.score - b.score; 
+    } 
+} 
 
 void draw() {
   
@@ -67,10 +93,44 @@ void draw() {
 
   // We must always step through time!
   box2d.step();
+   
+  
+  
   for (int i = boxes.size()-1; i >= 0; i--) {
     Box b = boxes.get(i);
     if (b.done()) {
       boxes.remove(i);
+      if(lock == 0){
+      if(lifeArray.size() <= 300){
+        lifeArray.add(new player(b.retunName() , b.lifeLength()));
+        
+        Box p = new Box(width/2 + random(20),height/2 + random(20));
+        boxes.add(p);
+        
+      }else{
+        lock = 1;
+        //for(int a = 0; a < lifeArray.size() - 200; a++){
+          //lifeArray.remove(lifeArray.indexOf(Collections.min(lifeArray)));
+        }
+      }else{
+        int boxScore = b.lifeLength();
+        Collections.sort(lifeArray, new SortPlayers());
+        player a = lifeArray.get(0);
+        
+        
+        if(boxScore > a.score){
+          lifeArray.remove(0);
+          lifeArray.add(new player(b.retunName() , b.lifeLength()));
+        }
+        
+        Box p = new Box(width/2 + random(20),height/2 + random(20));
+        player champ = lifeArray.get(floor(0.00001*pow(random(0 , 300) , 3.019)));
+        println(300 - floor(0.00001*pow(random(0 , 300) , 3.019)));
+        p.setNames(champ.brain);
+        p.mutate(5);
+        boxes.add(p);
+      
+      }
     }
   } 
   Sun.update();
@@ -99,8 +159,10 @@ void draw() {
 
   // Display all the boxes
   for (Box b: boxes) {
+    
     b.giveLife(Sun.returnSun(b.Pos));
     b.display();
+    b.update();
   }
 
   // Boxes that leave the screen, we delete them
@@ -112,4 +174,44 @@ void draw() {
   Vec2 mouse = new Vec2(mouseX , mouseY);
   text(frameRate,20,20);
   text(Sun.returnSun(mouse) , 20 , 40);
+  if(lock == 1){
+  Collections.sort(lifeArray, new SortPlayers());
+  player top1 = lifeArray.get(1);
+  player top2 = lifeArray.get(2);
+  player top3 = lifeArray.get(3);
+  player top4 = lifeArray.get(4);
+  player top5 = lifeArray.get(5);
+  player top6 = lifeArray.get(6);
+  player top7 = lifeArray.get(7);
+  player top8 = lifeArray.get(8);
+  player top9 = lifeArray.get(9);
+  player top10 = lifeArray.get(10);
+  
+  player top300 = lifeArray.get(300);
+  player top299 = lifeArray.get(299);
+  player top298 = lifeArray.get(298);
+  player top297 = lifeArray.get(297);
+  player top296 = lifeArray.get(296);
+  player top295 = lifeArray.get(295);
+  player top294 = lifeArray.get(294);
+  
+  text(top1.score , 20 , 60);
+  text(top2.score , 20 , 80);
+  text(top3.score , 20 , 100);
+  text(top4.score , 20 , 120);
+  text(top5.score , 20 , 140);
+  text(top6.score , 20 , 160);
+  text(top7.score , 20 , 180);
+  text(top8.score , 20 , 200);
+  text(top9.score , 20 , 220);
+  text(top10.score , 20 , 240);
+  text(top300.score , 20 , 260);
+  text(top299.score , 20 , 280);
+  text(top298.score , 20 , 300);
+  text(top297.score , 20 , 320);
+  text(top296.score , 20 , 340);
+  text(top295.score , 20 , 360);
+  text(top294.score , 20 , 380);
+  }
+
 }

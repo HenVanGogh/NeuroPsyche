@@ -4,31 +4,61 @@
 // Box2DProcessing example
 
 // A rectangular box
-
+int[] data;
 
 class Box {
- 
+
   // We need to keep track of a Body and a width and height
   Body body;
   float w;
   float h;
   int livespan = 5000;
   int btime;
-  int[] vision;
   Vec2 Pos = new Vec2(0 , 0);
+  int[] data;
+  int[][] visionTable;
+  float[] vision;
+  float[] output;
   
   
-  brain Brain = new brain(256 , 20 , 10 , 2 );
+  
+  brain Brain = new brain(256 , 10 , 10 , 2 );
 
   // Constructor
   Box(float x, float y) {
-    vision = new int[256];
+    int[][] visiontable = new int[366][2];
+    float[] vision = new float[256];
+    float[] output = new float[2];
+    int num = 0;
+    
+    for(int i = 0 ; i < 256; i++){
+     vision[i] = 0.0; 
+    }
+
+    int visionSize = 200;
+    int interval = 200 / 16;
+    
+    for(int i = 0; i < visionSize - interval; i = i + interval){
+      for(int n = 0; n < visionSize - interval; n = n + interval){
+        visiontable[num][0] = i - (visionSize/2) + 10;
+        visiontable[num][1] = n - (visionSize/2) + 10;
+        num++;
+      }
+
+    }
+    print(num);
+    visionTable = visiontable;
+    
+    
     btime = millis();
     w = random(8,16);
     h = w;
     // Add the box to the box2d world
     makeBody(new Vec2(x,y),w,h);
     Brain.generateRandomStart();
+    
+    
+    
   }
 
   // This function removes the particle from the box2d world
@@ -40,6 +70,12 @@ class Box {
       btime = btime + (life / 6);
     }
   }
+  
+  void reciveVisuals(int[] visual){
+    data = visual;
+  }
+  
+  
 
   // Is the particle ready for deletion?
   boolean done() {
@@ -78,16 +114,23 @@ class Box {
     body.applyForce(target, bodyVec);
   }
   
-  void updateBrain(int[] data){
-    Brain.returnResult(data);
-  }
   
-  float angle(){
-    return body.getAngle();
+  
+  void update(){
+    Vec2 pos = box2d.getBodyPixelCoord(body);
+    float[] Vision;
+    Vision = new float[255];
+    float tmp = 0;
+    for(int i = 0 ; i <=254; i++){
+      tmp = map(Sun.returnSun(new Vec2(visionTable[i][0] + pos.x , visionTable[i][1] + pos.y)), 0 , 500 , 0 , 1);  
+      Vision[i] = tmp;
+    }
+    output = Brain.returnResult(Vision);
+    print(output[0]);
+    print(" ");
+    print(output[1]);
+    println(" ");
   }
-
-
-
 
   // Drawing the box
   void display() {
@@ -105,7 +148,31 @@ class Box {
     //fill(300);
     stroke(0);
     rect(0,0,w,h);
+
+    
+    strokeWeight(6);
+    fill(0 , 255 , 255);
+    
+    for(int i = 0 ; i <=255; i++){
+        float fill = map(Sun.returnSun(new Vec2(visionTable[i][0] + pos.x , visionTable[i][1] + pos.y)), 0 , 500 , 0 , 255);
+        stroke( fill, 0 , fill);
+        point(float(visionTable[i][0]) , float(visionTable[i][1]));
+        
+        /*
+        print(i);
+        print(" ");
+        print(visionTable[i][0]);
+        print(" ");
+        print(visionTable[i][1]);
+        println(" ");
+        */
+      //point(v.x[i] , v.y[i]);
+    }
     popMatrix();
+    
+    
+    
+    //Sun.returnSun(10);
   }
 
   // This function adds the rectangle to the box2d world

@@ -76,12 +76,12 @@ class sun{
       for (PVector b: centers) {
         dist += size /PVector.dist(g.centerPoint , b);
       }
-      dist = floor(dist*5.0) * 13;
+      dist = floor(dist*10.0) * 13;
       g.show(round(dist));
       sumFill += round(dist) * 180;
       //println(dist);
   }
-  if (10000000 > sumFill) {
+  if (50000000 > sumFill) {
      shine p = new shine();
      shines.add(p); 
     }
@@ -92,7 +92,7 @@ class shine{
   float inX;
   float inY;
   float angle;
-  float speed = 0.37;
+  float speed = 0.3;
   
   shine(){
     if(random(0 , 1) > 0.5){

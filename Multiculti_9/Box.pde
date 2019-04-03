@@ -10,23 +10,35 @@ class Box {
 
   // We need to keep track of a Body and a width and height
   Body body;
+
   float w;
   float h;
   int livespan = 5000;
   int btime;
+  int Btime;
   Vec2 Pos = new Vec2(0 , 0);
   int[] data;
   int[][] visionTable;
+  float[] vision;
+  float[] output;
   
   
   
-  
-  brain Brain = new brain(256 , 20 , 10 , 2 );
+  brain Brain = new brain(256 , 10 , 10 , 2 );
 
   // Constructor
   Box(float x, float y) {
+
+    
+    
     int[][] visiontable = new int[366][2];
+    float[] vision = new float[256];
+    float[] output = new float[2];
     int num = 0;
+    
+    for(int i = 0 ; i < 256; i++){
+     vision[i] = 0.0; 
+    }
 
     int visionSize = 200;
     int interval = 200 / 16;
@@ -39,12 +51,13 @@ class Box {
       }
 
     }
-    print(num);
+    
     visionTable = visiontable;
     
     
     btime = millis();
-    w = random(8,16);
+    Btime = millis();
+    w = random(10,12);
     h = w;
     // Add the box to the box2d world
     makeBody(new Vec2(x,y),w,h);
@@ -52,6 +65,22 @@ class Box {
     
     
     
+  }
+  
+  ArrayList<float[]> retunName(){
+    return Brain.retunName();
+  }
+  
+  void setNames(ArrayList<float[]> name){
+    Brain.setNames(name);
+  }
+  
+  void mutate(int factor){
+    Brain.mutate(factor);
+  }
+  
+  int lifeLength(){
+    return millis() - Btime;
   }
 
   // This function removes the particle from the box2d world
@@ -95,7 +124,7 @@ class Box {
     worldTarget.subLocal(bodyVec);
     // Then, scale the vector to the specified force
     worldTarget.normalize();
-    worldTarget.mulLocal((float) 50);
+    worldTarget.mulLocal((float) 5);
     // Now apply it to the body's center of mass.
     body.applyForce(worldTarget, bodyVec);
   }
@@ -106,7 +135,37 @@ class Box {
     Vec2 bodyVec = body.getWorldCenter();
     body.applyForce(target, bodyVec);
   }
-
+  
+  void move_vec(Vec2 force){
+    Vec2 target = new Vec2(force.x , force.y);
+    target.normalize();
+    target.mulLocal((float) 50);
+    Vec2 bodyVec = body.getWorldCenter();
+    body.applyForce(target, bodyVec);
+  }
+  
+  
+  void update(){
+    Vec2 pos = box2d.getBodyPixelCoord(body);
+    float[] Vision;
+    Vision = new float[255];
+    float tmp = 0;
+    for(int i = 0 ; i <=254; i++){
+      tmp = map(Sun.returnSun(new Vec2(visionTable[i][0] + pos.x , visionTable[i][1] + pos.y)), 0 , 500 , 0 , 1);  
+      Vision[i] = tmp;
+      //print(tmp);
+      //print(" ");
+    }
+    //println(" ");
+    
+    output = Brain.returnResult(Vision);
+    fill(0);
+    //text(output[0] , 20 , 60);
+    //text(output[1] , 20 , 80);
+    
+    Vec2 target = new Vec2(output[0] - 5, output[1]- 5);
+    move_vec(target);
+  }
 
   // Drawing the box
   void display() {
@@ -125,18 +184,11 @@ class Box {
     stroke(0);
     rect(0,0,w,h);
 
-    
-    strokeWeight(2);
-    fill(0 , 255 , 255);
-    for(int i = 0 ; i <=300; i++){
-        point(float(visionTable[i][0]) , float(visionTable[i][1]));
-      //point(v.x[i] , v.y[i]);
-    }
-    
     popMatrix();
     
     
-    Sun.returnSun(10);
+    
+    //Sun.returnSun(10);
   }
 
   // This function adds the rectangle to the box2d world
@@ -152,9 +204,10 @@ class Box {
     FixtureDef fd = new FixtureDef();
     fd.shape = sd;
     // Parameters that affect physics
-    fd.density = 1;
+    fd.density = 5;
     fd.friction = 0.3;
-    fd.restitution = 0.5;
+    fd.restitution = 0.1;
+    fd.filter.groupIndex = -8;
 
     // Define the body and make it from the shape
     BodyDef bd = new BodyDef();

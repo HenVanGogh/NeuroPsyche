@@ -116,14 +116,14 @@ class brain{
     
   }
   
-  float[] returnResult(float[] input){
+  float[] returnResult(int[] input){
     float[] output = new float[Output.size()];
     float[] sigmoid = new float[Sigmoid.size()];
     float[] linear = new float[Linear.size()];
 
     int i = 0;
     for (neuron b: Sigmoid) {
-      sigmoid[i] = b.sigmoid(b.output(input));
+      sigmoid[i] = b.sigmoid(b.output(float(input)));
       i++;
     }
     
